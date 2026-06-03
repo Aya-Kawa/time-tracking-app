@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'ログイン')
+@section('title', '管理者ログイン')
 
 @section('css')
     <link rel="stylesheet" href="{{asset('css/auth.css')}}">
@@ -9,9 +9,9 @@
 @section('content')
     <div class="auth">
         <div class="auth__inner">
-            <h1 class="auth__title">ログイン</h1>
+            <h1 class="auth__title">管理者ログイン</h1>
 
-            <form action="/login" method="POST" novalidate>
+            <form action="/admin/login" method="POST" novalidate>
                 @csrf
                 <div class="form__group">
                     <label class="form__label">メールアドレス</label>
@@ -29,12 +29,9 @@
                     @endforeach
                 </div>
 
-                <button class="form__button " type="submit">ログイン</button>
+                <button class="form__button " type="submit">管理者ログインする</button>
             </form>
 
-            <div class="auth__link">
-                <p><a href="/register">会員登録はこちら</a></p>
-            </div>
         </div>
         <div>
 @endsection

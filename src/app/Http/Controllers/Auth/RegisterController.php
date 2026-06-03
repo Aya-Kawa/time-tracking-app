@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
@@ -24,6 +25,8 @@ class RegisterController extends Controller
             'password' => bcrypt($validated['password']),
         ]);
 
-        return redirect()->route('/');
+        Auth::login($user);
+        $user->sendEmailVerificationNotification();
+        return redirect()->route('verification.notice');
     }
 }
