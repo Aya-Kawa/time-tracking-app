@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AttendanceRecord;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -60,5 +61,44 @@ class AttendanceController extends Controller
         ]);
 
         return redirect()->route('attendance.index');
+    }
+
+    /* 勤怠一覧画面 */
+    public function list(Request $request)
+    {
+        $currentMonth = $request->input('month')
+            ? Carbon::parse($request->input('month'))
+            : Carbon::now();
+
+        $previousMonth = $currentMonth->copy()->subMonth();
+        $nextMonth = $currentMonth->copy()->addMonth();
+
+        $attendances = AttendanceRecord::where('user_id', Auth::id())
+            ->whereYear('work_date', $currentMonth->year)
+            ->whereMonth('work_date', $currentMonth->month)
+            ->get();
+
+        foreach ($attendances as $attendance) {
+            $attendance->display_date = Carbon::parse($attendance->work_date)->locale('ja')->isoformat('MM/DD (ddd)');
+            $attendance->display_clock_in = $attendance->clock_in ? Carbon::parse($attendance->clock_in)->format('H:i') : '';
+            $attendance->display_clock_out = $attendance->clock_out ? Carbon::parse($attendance->clock_out)->format('H:i') : '';
+
+            $totalBreakMinutes = 0;
+            foreach ($attendance->breakTimes as $breakTime) {
+                if ($breakTime->start_time && $breakTime->end_time) {
+                    $totalBreakMinutes += Carbon::parse($breakTime->start_time)->diffInMinutes(Carbon::parse($breakTime->end_time));
+                }
+
+            }
+            $attendance->display_break_time = floor($totalBreakMinutes / 60) . ':' . str_pad($totalBreakMinutes % 60, 2, 0, STR_PAD_LEFT);
+
+            $workingMinutes = 0;
+            if ($attendance->clock_in && $attendance->clock_out) {
+                $workingMinutes = Carbon::parse($attendance->clock_in)->diffInMinutes(Carbon::parse($attendance->clock_out)) - $totalBreakMinutes;
+            }
+            $actualWorkingMinutes = $workingMinutes - $totalBreakMinutes;
+            $attendance->display_working_time = floor($actualWorkingMinutes / 60) . ':' . str_pad($actualWorkingMinutes % 60, 2, 0, STR_PAD_LEFT);
+        }
+        return view('attendance.list', compact('currentMonth', 'previousMonth', 'nextMonth', 'attendances'));
     }
 }
