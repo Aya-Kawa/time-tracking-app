@@ -49,5 +49,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/attendance/break-start',[AttendanceController::class, 'breakStart'])->name('attendance.break-start');
     Route::post('/attendance/break-end',[AttendanceController::class, 'breakEnd'])->name('attendance.break-end');
     Route::post('/attendance/clock-out',[AttendanceController::class, 'clockOut'])->name('attendance.clock-out');
+
+    /* 勤怠一覧画面 */
+    Route::get('/attendance/list', [AttendanceController::class, 'list'])->name('attendance.list');
 });
+
+
+
 
