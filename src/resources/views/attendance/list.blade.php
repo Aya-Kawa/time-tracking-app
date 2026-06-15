@@ -34,7 +34,7 @@
                         <td>{{ $attendance->display_clock_out }}</td>
                         <td>{{ $attendance->display_break_time }}</td>
                         <td>{{ $attendance->display_working_time }}</td>
-                        <td><a href="#">詳細</a></td>
+                        <td><a href="{{ route('attendance.show', $attendance->id) }}">詳細</a></td>
                     </tr>
                 @endforeach
             </table>

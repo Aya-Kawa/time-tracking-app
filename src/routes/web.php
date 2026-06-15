@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceCorrectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,14 +46,23 @@ Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('adm
 /* 出勤登録画面 */
 Route::middleware('auth')->group(function () {
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-    Route::post('/attendance/clock-in',[AttendanceController::class, 'clockIn'])->name('attendance.clock-in');
-    Route::post('/attendance/break-start',[AttendanceController::class, 'breakStart'])->name('attendance.break-start');
-    Route::post('/attendance/break-end',[AttendanceController::class, 'breakEnd'])->name('attendance.break-end');
-    Route::post('/attendance/clock-out',[AttendanceController::class, 'clockOut'])->name('attendance.clock-out');
+    Route::post('/attendance/clock-in', [AttendanceController::class, 'clockIn'])->name('attendance.clock-in');
+    Route::post('/attendance/break-start', [AttendanceController::class, 'breakStart'])->name('attendance.break-start');
+    Route::post('/attendance/break-end', [AttendanceController::class, 'breakEnd'])->name('attendance.break-end');
+    Route::post('/attendance/clock-out', [AttendanceController::class, 'clockOut'])->name('attendance.clock-out');
 
     /* 勤怠一覧画面 */
     Route::get('/attendance/list', [AttendanceController::class, 'list'])->name('attendance.list');
+
+    /*勤怠詳細画面*/
+    Route::get('/attendance/{id}', [AttendanceController::class, 'show'])->name('attendance.show');
+    Route::post('/attendance/{id}/correction', [AttendanceController::class, 'storeCorrection'])->name('attendance.correction.store');
+
+    /*申請一覧画面*/
+    Route::get('/stamp_correction_request/list', [AttendanceCorrectionController::class, 'index'])->name('stamp_correction_request.index');
 });
+
+
 
 
 

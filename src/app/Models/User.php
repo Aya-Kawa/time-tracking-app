@@ -44,6 +44,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function attendances()
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasMany(AttendanceRecord::class);
+    }
+
+    public function attendanceCorrections()
+    {
+        return $this->hasMany(AttendanceCorrection::class);
     }
 }

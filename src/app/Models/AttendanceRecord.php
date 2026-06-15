@@ -25,4 +25,9 @@ class AttendanceRecord extends Model
     {
         return $this->hasMany(BreakTime::class, 'attendance_records_id');
     }
+
+    public function attendanceCorrection()
+    {
+        return $this->hasMany(AttendanceCorrection::class);
+    }
 }

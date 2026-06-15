@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AttendanceCorrectionRequest;
 use Illuminate\Http\Request;
 use App\Models\AttendanceRecord;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\AttendanceCorrection;
+use App\Models\AttendanceCorrectionBreak;
 
 class AttendanceController extends Controller
 {
@@ -100,5 +103,41 @@ class AttendanceController extends Controller
             $attendance->display_working_time = floor($actualWorkingMinutes / 60) . ':' . str_pad($actualWorkingMinutes % 60, 2, 0, STR_PAD_LEFT);
         }
         return view('attendance.list', compact('currentMonth', 'previousMonth', 'nextMonth', 'attendances'));
+    }
+
+    /* 勤怠詳細画面 */
+    public function show($id)
+    {
+        $attendance = AttendanceRecord::with('breakTimes')->where('user_id', Auth::id())->findOrFail($id);
+        $pendingCorrection = $attendance->attendanceCorrection()->where('status', 'pending')->first();
+        return view('attendance.show', compact('attendance', 'pendingCorrection'));
+    }
+
+    public function storeCorrection(AttendanceCorrectionRequest $request, $id)
+    {
+        $attendance = AttendanceRecord::where('user_id', Auth::id())->findOrFail($id);
+
+        $pendingCorrection = $attendance->attendanceCorrection()->where('status', 'pending')->exists();
+        if ($pendingCorrection) {
+            return redirect()->route('attendance.show', $id);
+        }
+
+        $correction = AttendanceCorrection::create([
+            'attendance_record_id' => $attendance->id,
+            'user_id' => Auth::id(),
+            'work_date' => $attendance->work_date,
+            'clock_in' => Carbon::parse($request->input('start_time')),
+            'clock_out' => Carbon::parse($request->input('end_time')),
+            'remarks' => $request->input('remarks'),
+            'status' => 'pending',
+        ]);
+
+        foreach ($request->breaks as $break) {
+            $correction->breakTimes()->create([
+                'start_time' => Carbon::parse($break['start_time']),
+                'end_time' => Carbon::parse($break['end_time']),
+            ]);
+        }
+        return redirect()->route('attendance.show', $id);
     }
 }
