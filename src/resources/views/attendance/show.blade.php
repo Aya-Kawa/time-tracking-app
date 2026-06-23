@@ -22,9 +22,9 @@
                     <tr>
                         <th>日付</th>
                         <td>
-                            {{\Carbon\Carbon::parse($attendance->date)->format('Y年') }}
+                            {{\Carbon\Carbon::parse($attendance->work_date)->format('Y年') }}
                             <span></span>
-                            {{\Carbon\Carbon::parse($attendance->date)->format('n月j日')}}
+                            {{\Carbon\Carbon::parse($attendance->work_date)->format('n月j日')}}
                         </td>
 
                     </tr>

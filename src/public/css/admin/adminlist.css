@@ -1,15 +1,15 @@
-.request-list {
+.admin-attendance {
     background: #f5f5f5;
     min-height: calc(100vh - 80px);
 }
 
-.request-list__inner {
+.admin-attendance__inner {
     width: 70%;
     margin: 0 auto;
     padding: 80px 0;
 }
 
-.request-list__title {
+.admin-attendance__title {
     font-size: 30px;
     font-weight: bold;
     border-left: 8px solid #000;
@@ -17,26 +17,28 @@
     margin-bottom: 50px;
 }
 
-.request-list__tabs {
+.admin-attendance__nav {
     display: flex;
-    gap: 80px;
-    border-bottom: 1px solid #000;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 15px 30px;
+    border-radius: 10px;
     margin-bottom: 40px;
-    padding-left: 40px;
 }
 
-.request-list__tabs a {
+.admin-attendance__nav a {
     text-decoration: none;
-    color: #888;
+    color: #737373;
     font-weight: bold;
-    padding-bottom: 15px;
 }
 
-.request-list__tabs a.active {
-    color: #000;
+.admin-attendance__date {
+    font-size: 20px;
+    font-weight: bold;
 }
 
-.request-list__table {
+.admin-attendance__table {
     width: 100%;
     background: #fff;
     border-radius: 10px;
@@ -44,29 +46,21 @@
     overflow: hidden;
 }
 
-.request-list__table th,
-.request-list__table td {
+.admin-attendance__table th,
+.admin-attendance__table td {
     padding: 18px 20px;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e5e5e5;
     color: #737373;
     font-weight: bold;
 }
 
-.request-list__table th {
-    font-size: 16px;
-}
-
-.request-list__table td {
-    font-size: 15px;
-}
-
-.request-list__table tr:last-child td {
+.admin-attendance__table tr:last-child td {
     border-bottom: none;
 }
 
-.request-list__table a {
-    color: #000;
+.admin-attendance__table a {
     text-decoration: none;
+    color: #000;
     font-weight: bold;
 }

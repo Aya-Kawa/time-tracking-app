@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCorrectionController;
+use App\Http\Controllers\AdminAttendanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +61,14 @@ Route::middleware('auth')->group(function () {
 
     /*申請一覧画面*/
     Route::get('/stamp_correction_request/list', [AttendanceCorrectionController::class, 'index'])->name('stamp_correction_request.index');
+});
+
+Route::middleware('auth')->group(function () {
+    /* 管理者用勤怠一覧画面 */
+    Route::get('/admin/attendance/list', [AdminAttendanceController::class, 'index'])->name('admin.attendance.list');
+    /* 管理者用勤怠詳細画面 */
+    Route::get('/admin/attendance/{id}', [AdminAttendanceController::class, 'show'])->name('admin.attendance.show');
+    Route::post('/admin/attendance/{id}/update', [AdminAttendanceController::class, 'update'])->name('admin.attendance.update');
 });
 
 
