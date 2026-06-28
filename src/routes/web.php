@@ -58,12 +58,17 @@ Route::middleware('auth')->group(function () {
     /* 勤怠一覧画面 */
     Route::get('/attendance/list', [AttendanceController::class, 'list'])->name('attendance.list');
 
+    /*マイ勤怠レポート*/
+    Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
+
     /*勤怠詳細画面*/
     Route::get('/attendance/{id}', [AttendanceController::class, 'show'])->name('attendance.show');
     Route::post('/attendance/{id}/correction', [AttendanceController::class, 'storeCorrection'])->name('attendance.correction.store');
 
     /*申請一覧画面*/
     Route::get('/stamp_correction_request/list', [AttendanceCorrectionController::class, 'index'])->name('stamp_correction_request.index');
+
+
 });
 
 Route::middleware('auth')->group(function () {

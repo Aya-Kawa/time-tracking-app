@@ -140,4 +140,95 @@ class AttendanceController extends Controller
         }
         return redirect()->route('attendance.show', $id);
     }
+
+    public function report()
+    {
+        $user = Auth::user();
+        $startMonth = Carbon::now()->copy()->subMonths(5)->startOfMonth();
+        $endMonth = Carbon::now()->copy()->endOfMonth();
+        $attendances = AttendanceRecord::with('breakTimes')
+            ->where('user_id', $user->id)
+            ->whereBetween('work_date', [$startMonth, $endMonth])
+            ->get();
+
+        $totalWorkMinutes = 0;
+        $totalOvertimeMinutes = 0;
+        $workDays = 0;
+        $monthlyReports = [];
+        $lateCount = 0;
+        $earlyLeaveCount = 0;
+        $longWorkCount = 0;
+        for ($i = 5; $i >= 0; $i--) {
+            $month = Carbon::now()->copy()->subMonths($i);
+            $monthKey = $month->format('Y-m');
+            $monthlyReports[$monthKey] = [
+                'month' => $monthKey,
+                'work_minutes' => 0,
+                'overtime_minutes' => 0,
+            ];
+        }
+
+        foreach ($attendances as $attendance) {
+            if (!$attendance->clock_in || !$attendance->clock_out) {
+                continue;
+            }
+
+            $breakMinutes = 0;
+
+            foreach ($attendance->breakTimes as $breakTime) {
+                if ($breakTime->start_time && $breakTime->end_time) {
+                    $breakMinutes += Carbon::parse($breakTime->start_time)
+                        ->diffInMinutes(Carbon::parse($breakTime->end_time));
+                }
+            }
+
+            $workMinutes = Carbon::parse($attendance->clock_in)
+                ->diffInMinutes(Carbon::parse($attendance->clock_out))
+                - $breakMinutes;
+
+            $overtimeMinutes = max(0, $workMinutes - 480);
+            $totalWorkMinutes += $workMinutes;
+            $totalOvertimeMinutes += $overtimeMinutes;
+            $workDays++;
+            $monthKey = Carbon::parse($attendance->work_date)->format('Y-m');
+
+            if (isset($monthlyReports[$monthKey])) {
+                $monthlyReports[$monthKey]['work_minutes'] += $workMinutes;
+                $monthlyReports[$monthKey]['overtime_minutes'] += $overtimeMinutes;
+            }
+
+            if (
+                Carbon::parse($attendance->work_date)->isSameMonth(Carbon::now()) &&
+                Carbon::parse($attendance->work_date)->isSameYear(Carbon::now())
+            ) {
+
+                if (Carbon::parse($attendance->clock_in)->format('H:i') > '09:00') {
+                    $lateCount++;
+                }
+
+                if (Carbon::parse($attendance->clock_out)->format('H:i') < '18:00') {
+                    $earlyLeaveCount++;
+                }
+
+                if ($workMinutes > 600) {
+                    $longWorkCount++;
+                }
+            }
+        }
+
+        $averageWorkMinutes = $workDays > 0
+            ? floor($totalWorkMinutes / $workDays)
+            : 0;
+
+        return view('attendance.report', compact(
+            'user',
+            'totalWorkMinutes',
+            'totalOvertimeMinutes',
+            'averageWorkMinutes',
+            'monthlyReports',
+            'lateCount',
+            'earlyLeaveCount',
+            'longWorkCount'
+        ));
+    }
 }
