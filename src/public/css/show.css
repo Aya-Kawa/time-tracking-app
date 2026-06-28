@@ -85,6 +85,7 @@
     text-align: right;
 }
 
+
 .attendance-detail__button button {
     width: 130px;
     height: 50px;
@@ -103,3 +104,33 @@
     font-size: 14px;
     font-weight: bold;
 }
+
+.correction-detail__button {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 40px;
+}
+
+.approve-button {
+    width: 130px;
+    height: 50px;
+    border: none;
+    border-radius: 6px;
+    background: #000;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.approve-button:hover {
+    opacity: 0.9;
+}
+
+.attendance-detail__button button.approve-button.approve-button--disabled {
+    background-color: #666 !important;
+    color: #fff !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+}
+

@@ -9,6 +9,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCorrectionController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\AdminStaffController;
+use App\Http\Controllers\AdminCorrectionController;
 
 
 /*
@@ -78,6 +79,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/attendance/staff/{id}', [AdminStaffController::class, 'attendanceList'])->name('admin.staff.attendance.list');
     /*CSV出力用*/
     Route::get('admin/attendance/staff/{id}/csv', [AdminStaffController::class, 'exportCsv'])->name('admin.staff.attendance.csv');
+
+
+    /*管理者用 修正申請一覧*/
+    Route::get('/admin/stamp_correction_request/list', [AdminCorrectionController::class, 'index'])
+        ->name('admin.correction.index');
+
+    /*管理者用 修正申請詳細*/
+    Route::get('/admin/stamp_correction_request/{id}', [AdminCorrectionController::class, 'show'])
+        ->name('admin.correction.show');
+
+    /*管理者用 承認*/
+    Route::post('/admin/stamp_correction_request/{id}/approve', [AdminCorrectionController::class, 'approve'])
+        ->name('admin.correction.approve');
 });
 
 
