@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCorrectionController;
 use App\Http\Controllers\AdminAttendanceController;
+use App\Http\Controllers\AdminStaffController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -69,6 +71,13 @@ Route::middleware('auth')->group(function () {
     /* 管理者用勤怠詳細画面 */
     Route::get('/admin/attendance/{id}', [AdminAttendanceController::class, 'show'])->name('admin.attendance.show');
     Route::post('/admin/attendance/{id}/update', [AdminAttendanceController::class, 'update'])->name('admin.attendance.update');
+
+    /*管理者用スタッフ一覧画面*/
+    Route::get('/admin/staff/list', [AdminStaffController::class, 'index'])->name('admin.staff.list');
+    /*スタッフ月次勤怠一覧*/
+    Route::get('/admin/attendance/staff/{id}', [AdminStaffController::class, 'attendanceList'])->name('admin.staff.attendance.list');
+    /*CSV出力用*/
+    Route::get('admin/attendance/staff/{id}/csv', [AdminStaffController::class, 'exportCsv'])->name('admin.staff.attendance.csv');
 });
 
 
