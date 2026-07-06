@@ -42,7 +42,7 @@ class AdminAttendanceRequest extends FormRequest
             'end_time.after' => '出勤時間もしくは退勤時間が不適切な値です。',
             'breaks.*.start_time.date_format' => '休憩開始時間はHH:MMの形式で入力してください。',
             'breaks.*.end_time.date_format' => '休憩終了時間はHH:MMの形式で入力してください。',
-            'remarks.required' => '備考を入力してください。',
+            'remarks.required' => '備考を記入してください。',
         ];
     }
 

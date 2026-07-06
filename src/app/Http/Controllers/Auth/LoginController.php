@@ -28,7 +28,11 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect('/');
+        if (Auth::user()->admin_status) {
+            return redirect()->intended(route('admin.attendance.list'));
+        }
+
+        return redirect()->intended(route('attendance.index'));
 
     }
 
