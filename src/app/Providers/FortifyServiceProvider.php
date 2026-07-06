@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Contracts\VerifyEmailResponse;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -36,6 +38,27 @@ class FortifyServiceProvider extends ServiceProvider
 
         Fortify::loginView(function () {
             return view('auth.login');
+        });
+
+        $this->app->singleton(LoginResponse::class, function () {
+            return new class implements LoginResponse {
+                public function toResponse($request)
+                {
+                    if (auth()->user()->admin_status) {
+                        return redirect()->route('admin.attendance.list');
+                    }
+                    return redirect()->route('attendance.index');
+                }
+            };
+        });
+
+        $this->app->singleton(VerifyEmailResponse::class, function () {
+            return new class implements VerifyEmailResponse {
+                public function toResponse($request)
+                {
+                    return redirect()->route('attendance.index');
+                }
+            };
         });
 
         RateLimiter::for('login', function (Request $request) {

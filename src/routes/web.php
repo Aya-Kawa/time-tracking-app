@@ -34,7 +34,10 @@ Route::get('/email/verify', function () {
 })->middleware('auth')->name('verification.notice');
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-    return redirect()->route('profile.edit');
+    if (auth()->user() && auth()->user()->admin_status) {
+        return redirect()->route('admin.attendance.list');
+    }
+    return redirect()->route('attendance.index');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();

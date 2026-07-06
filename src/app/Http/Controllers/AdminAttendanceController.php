@@ -58,13 +58,13 @@ class AdminAttendanceController extends Controller
             [
                 'user_id' => $attendance->user_id,
                 'work_date' => $attendance->work_date,
-                'clock_in' => Carbon::parse($request->input('clock_in')),
-                'clock_out' => Carbon::parse($request->input('clock_out')),
+                'clock_in' => Carbon::parse($request->input('start_time')),
+                'clock_out' => Carbon::parse($request->input('end_time')),
                 'remarks' => $request->input('remarks'),
                 'status' => 'pending',
             ]
         );
-        foreach ($request->breaks as $break) {
+        foreach ($request->input('breaks', []) as $break) {
             $correction->breakTimes()->create([
                 'start_time' => Carbon::parse($break['start_time']),
                 'end_time' => Carbon::parse($break['end_time']),

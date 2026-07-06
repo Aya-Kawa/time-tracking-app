@@ -68,42 +68,40 @@ class AttendanceController extends Controller
 
     /* 勤怠一覧画面 */
     public function list(Request $request)
-    {
-        $currentMonth = $request->input('month')
-            ? Carbon::parse($request->input('month'))
-            : Carbon::now();
+{
+   $currentMonth = $request->input('month')
+       ? Carbon::parse($request->input('month'))
+       : Carbon::now();
 
-        $previousMonth = $currentMonth->copy()->subMonth();
-        $nextMonth = $currentMonth->copy()->addMonth();
+   $previousMonth = $currentMonth->copy()->subMonth();
+   $nextMonth = $currentMonth->copy()->addMonth();
 
-        $attendances = AttendanceRecord::where('user_id', Auth::id())
-            ->whereYear('work_date', $currentMonth->year)
-            ->whereMonth('work_date', $currentMonth->month)
-            ->get();
+   $attendances = AttendanceRecord::with('breakTimes')
+       ->where('user_id', Auth::id())
+       ->whereYear('work_date', $currentMonth->year)
+       ->whereMonth('work_date', $currentMonth->month)
+       ->get()
+       ->keyBy(function ($attendance) {
+           return Carbon::parse($attendance->work_date)->format('Y-m-d');
+       });
 
-        foreach ($attendances as $attendance) {
-            $attendance->display_date = Carbon::parse($attendance->work_date)->locale('ja')->isoformat('MM/DD (ddd)');
-            $attendance->display_clock_in = $attendance->clock_in ? Carbon::parse($attendance->clock_in)->format('H:i') : '';
-            $attendance->display_clock_out = $attendance->clock_out ? Carbon::parse($attendance->clock_out)->format('H:i') : '';
+   $dates = [];
 
-            $totalBreakMinutes = 0;
-            foreach ($attendance->breakTimes as $breakTime) {
-                if ($breakTime->start_time && $breakTime->end_time) {
-                    $totalBreakMinutes += Carbon::parse($breakTime->start_time)->diffInMinutes(Carbon::parse($breakTime->end_time));
-                }
+   $startDate = $currentMonth->copy()->startOfMonth();
+   $endDate = $currentMonth->copy()->endOfMonth();
 
-            }
-            $attendance->display_break_time = floor($totalBreakMinutes / 60) . ':' . str_pad($totalBreakMinutes % 60, 2, 0, STR_PAD_LEFT);
+   for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+       $dates[] = $date->copy();
+   }
 
-            $workingMinutes = 0;
-            if ($attendance->clock_in && $attendance->clock_out) {
-                $workingMinutes = Carbon::parse($attendance->clock_in)->diffInMinutes(Carbon::parse($attendance->clock_out)) - $totalBreakMinutes;
-            }
-            $actualWorkingMinutes = $workingMinutes - $totalBreakMinutes;
-            $attendance->display_working_time = floor($actualWorkingMinutes / 60) . ':' . str_pad($actualWorkingMinutes % 60, 2, 0, STR_PAD_LEFT);
-        }
-        return view('attendance.list', compact('currentMonth', 'previousMonth', 'nextMonth', 'attendances'));
-    }
+   return view('attendance.list', compact(
+       'currentMonth',
+       'previousMonth',
+       'nextMonth',
+       'attendances',
+       'dates'
+   ));
+} 
 
     /* 勤怠詳細画面 */
     public function show($id)
@@ -132,7 +130,7 @@ class AttendanceController extends Controller
             'status' => 'pending',
         ]);
 
-        foreach ($request->breaks as $break) {
+        foreach ($request->input('breaks',[]) as $break) {
             $correction->breakTimes()->create([
                 'start_time' => Carbon::parse($break['start_time']),
                 'end_time' => Carbon::parse($break['end_time']),
